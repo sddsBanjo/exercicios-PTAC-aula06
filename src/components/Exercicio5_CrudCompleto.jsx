@@ -7,8 +7,25 @@ import {
 } from "../api/usuarios";
 import ListaUsuarios from "./ListaUsuarios";
 import FormularioUsuario from "./FormularioUsuario";
+import { ApiError } from "../api";
 
 const FORM_VAZIO = { name: "", email: "" };
+
+function mensagemErro(erro) {
+    if (erro instanceof ApiError && erro.status === 404) {
+        return "Recurso não encontrado";
+    }
+
+    if (erro instanceof ApiError && erro.status >= 500) {
+        return "Erro no servidor";
+    }
+
+    if (erro instanceof TypeError) {
+        return "Falha de rede";
+    }
+
+    return erro.message;
+}
 
 export default function Exercicio5CrudCompleto() {
     const [usuarios, setUsuarios] = useState([]);
@@ -40,7 +57,7 @@ export default function Exercicio5CrudCompleto() {
                 setUsuarios(await buscarUsuarios(controller.signal));
             } catch (erroRequisicao) {
                 if (erroRequisicao.name !== "AbortError") {
-                    setErro(erroRequisicao.message);
+                    setErro(mensagemErro(erroRequisicao));
                 }
             } finally {
                 controllersAtivos.current.delete(controller);
@@ -122,7 +139,7 @@ export default function Exercicio5CrudCompleto() {
             fecharForm();
         } catch (erroRequisicao) {
             if (erroRequisicao.name !== "AbortError") {
-                setErro(erroRequisicao.message);
+                setErro(mensagemErro(erroRequisicao));
                 setUsuarios(listaAnterior);
             }
         } finally {
@@ -143,7 +160,7 @@ export default function Exercicio5CrudCompleto() {
             console.log(`Usuário ${nome} excluído`);
         } catch (erroRequisicao) {
             if (erroRequisicao.name !== "AbortError") {
-                setErro(erroRequisicao.message);
+                setErro(mensagemErro(erroRequisicao));
                 setUsuarios(listaAnterior);
             }
         } finally {

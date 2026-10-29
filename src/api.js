@@ -1,5 +1,14 @@
 const BASE_URL = "https://jsonplaceholder.typicode.com";
 
+export class ApiError extends Error {
+    constructor(status, statusText, message) {
+        super(message || `${status} ${statusText}`);
+        this.name = "ApiError";
+        this.status = status;
+        this.statusText = statusText;
+    }
+}
+
 async function requisicao(caminho, opcoes = {}) {
     const url = `${BASE_URL}${caminho}`;
 
@@ -15,7 +24,7 @@ async function requisicao(caminho, opcoes = {}) {
     const resposta = await fetch(url, configuracoes);
 
     if (!resposta.ok) {
-        throw new Error(`HTTP ${resposta.status} ${resposta.statusText}`);
+        throw new ApiError(resposta.status, resposta.statusText);
     }
 
     if (resposta.status === 204) return null;
