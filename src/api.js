@@ -10,11 +10,14 @@ export class ApiError extends Error {
 }
 
 async function requisicao(caminho, opcoes = {}) {
-    const { signal, ...resto } = opcoes;
+    const { signal, headers: headersDaChamada = {}, ...resto } = opcoes;
     const url = `${BASE_URL}${caminho}`;
 
     const configuracoes = {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            ...headersDaChamada,
+        },
         ...resto,
         ...(signal ? { signal } : {}),
     };
